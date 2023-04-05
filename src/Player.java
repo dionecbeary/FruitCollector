@@ -1,6 +1,7 @@
 public class Player {
     public int xpos, ypos, width, height, dx, dy;
     public boolean isAlive;
+    public Rectangle rec;
     public Player(int pXpos, int pYpos, int pDx, int pDy){
         xpos = pXpos;
         ypos = pYpos;
@@ -9,10 +10,12 @@ public class Player {
         height = 30;
         dx = pDx;
         dy = pDy;
+        rec = new Rectangle(xpos, ypos, (int)width, height);
     }
     public void move(){
         xpos = xpos + dx;
         ypos = ypos + dy;
+        rec = new Rectangle(xpos, ypos, (int)width, height);
     }
     public void crash(int left, int right){
         if (ypos>640 || ypos<0){// ypos > 700-hieght

@@ -1,6 +1,7 @@
 public class Fruit {
     public int xpos, ypos, width, height, dx, dy, image;
     public boolean isAlive;
+    public Rectangle rec;
     public Fruit(int pXpos, int pYpos, int pDx, int pDy, int img ){
         xpos = pXpos;
         ypos = pYpos;
@@ -10,6 +11,7 @@ public class Fruit {
         dx = pDx;
         dy = pDy;
         image = img;
+        rec = new Rectangle(xpos, ypos, (int)width, height);
     }
 
     public void crash(int left, int right){
@@ -23,5 +25,6 @@ public class Fruit {
     public void move(){
         xpos = xpos + dx;
         ypos = ypos + dy;
+        rec = new Rectangle(xpos, ypos, (int)width, height);
     }
 }

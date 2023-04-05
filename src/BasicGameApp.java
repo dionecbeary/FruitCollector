@@ -1,16 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class BasicGameApp implements Runnable, KeyListener, MouseListener {
+public class BasicGameApp implements Runnable, KeyListener, MouseListener, MouseMotionListener {
     final int WIDTH = 1000;
     final int HEIGHT = 700;
     public JFrame frame;
-    public int d1, d2;
+    public int d1, d2, score1, score2;
     public boolean started;
     public Canvas canvas;
     public JPanel panel;
@@ -39,6 +38,8 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
         P2 = new Player(915, 325, 0, 0);
         d1 = 2;
         d2 = 2;
+        score1 = 0;
+        score2 = 0;
         started = false;
         Fruits = new Fruit[5];
         for (int i = 0; i<5; i++){
@@ -50,7 +51,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
         //for the moment we will loop things forever.
         while (true) {
             if (started == true){
-                moveThings();  //move all the game objects
+                moveThings();//move all the game objects
             }
             render();  // paint the graphics
 //            pause(10); // sleep for 10 ms
@@ -64,6 +65,14 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
         P1.move();
         P2.crash(100, 940);
         P2.move();
+    }
+    public void intersections(){
+        for (int i = 0; i<5; i++){
+           if (Fruits[i].rec.intersects(P1.rec)){
+               System.out.println("intersection");
+           }
+            Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
+        }
     }
 
     public void pause(int time) {
@@ -87,6 +96,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
         canvas = new Canvas();
         canvas.addKeyListener(this);
         canvas.addMouseListener(this);
+        canvas.addMouseMotionListener(this);
         canvas.setBounds(0, 0, WIDTH, HEIGHT);
         canvas.setIgnoreRepaint(true);
 
@@ -118,6 +128,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
         g.drawImage(Pic2, P2.xpos, P2.ypos, 60, 50, null);
         for (int i = 0; i < 5; i++){
             g.drawImage(FruitPics[Fruits[i].image], Fruits[i].xpos, Fruits[i].ypos, 40,40,null);
+            g.draw(new Rectangle(Fruits[i].xpos, Fruits[i].ypos, 40,40));
         }
         if (started == false){
             g.drawImage(startPic, 400, 300, 200, 100, null);
@@ -211,14 +222,28 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
-            System.out.println("hovering");
-        }
+
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+//        System.out.println(e.getX() + e.getY());
+        if (started == false && e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
+            System.out.println("hovering");
+            startPic = Toolkit.getDefaultToolkit().getImage("Start copy.png");
+        }else{
+            startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
+        }
     }
 }
 //    @Override
