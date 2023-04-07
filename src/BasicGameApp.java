@@ -4,22 +4,25 @@ import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.lang.*;
 
 public class BasicGameApp implements Runnable, KeyListener, MouseListener, MouseMotionListener {
     final int WIDTH = 1000;
     final int HEIGHT = 700;
     public JFrame frame;
     public int d1, d2, score1, score2, fruitCount;
-    public boolean started;
+    public int startTime;
+    public boolean started, ended;
     public Canvas canvas;
     public JPanel panel;
     public BufferStrategy bufferStrategy;
     public Player P1, P2;
     public Image greenLPic, greenRPic, purpleLPic, purpleRPic;
     public Image Pic1, Pic2;
-    public Image arenaPic, startPic;
+    public Image arenaPic, startPic, scorePic;
     public Image[] FruitPics = {Toolkit.getDefaultToolkit().getImage("Fruit1.png"), Toolkit.getDefaultToolkit().getImage("Fruit2.png"), Toolkit.getDefaultToolkit().getImage("Fruit3.png"), Toolkit.getDefaultToolkit().getImage("Fruit4.png"), Toolkit.getDefaultToolkit().getImage("Fruit5.png")};
     public Fruit[] Fruits;
+    public Fruit[] deadFruits;
 
     public static void main(String[] args) {
         BasicGameApp ex = new BasicGameApp();   //creates a new instance of the game
@@ -33,6 +36,8 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         purpleLPic = Toolkit.getDefaultToolkit().getImage("purpleL.png");
         purpleRPic = Toolkit.getDefaultToolkit().getImage("purpleR.png");
         startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
+        scorePic = Toolkit.getDefaultToolkit().getImage("score.png");
+
         Pic1 = greenRPic;
         Pic2 = purpleLPic;
         arenaPic = Toolkit.getDefaultToolkit().getImage("arena.jpeg");
@@ -44,6 +49,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         score2 = 0;
         fruitCount = 0;
         started = false;
+        ended = false;
         Fruits = new Fruit[5];
         for (int i = 0; i<Fruits.length; i++){
             Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
@@ -70,7 +76,24 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         P1.move();
         P2.crash(100, 940);
         P2.move();
+        timer();
         intersections();
+    }
+    public void timer(){
+        int currentTime = (int)(System.currentTimeMillis());
+        if (currentTime - startTime == 30000){
+            started = false;
+            ended = true;
+            System.out.println("Player 1: " + score1 + "    Player 2: " + score2);
+            if (score1 > score2){
+                System.out.println("Player 1 wins!");
+            }else if (score2 > score1){
+                System.out.println("Player 2 wins!");
+            }else if (score1 == score2){
+                System.out.println("You are tied!");
+            }
+        }
+
     }
     public void intersections(){
         for (int i = 0; i<Fruits.length; i++){
@@ -85,13 +108,12 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
                     Fruits[i].isAlive = false;
                     fruitCount -=1;
                 }
-                if (fruitCount < 3 ){
-
-                    Fruits[Fruits.length+1] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i%5);
-                    fruitCount += 1;
+                if (fruitCount < 2 ){
+                    int n = (int)(Math.random()*5);
+                    Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, n);
+                    Fruits[i].isAlive = true;
+                    fruitCount +=1;
                 }
-                    System.out.println(fruitCount);
-
             }
         }
     }
@@ -150,7 +172,11 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         g.drawImage(Pic1, P1.xpos, P1.ypos, 60, 50, null);
         g.drawImage(Pic2, P2.xpos, P2.ypos, 60, 50, null);
         if (started == false){
-            g.drawImage(startPic, 400, 300, 200, 100, null);
+            if (ended == false){
+                g.drawImage(startPic, 400, 300, 200, 100, null);
+            }else if (ended == true){
+                g.drawImage(scorePic,420, 330, 160, 40, null);
+            }
         } else if (started == true){
             for (int i = 0; i < Fruits.length; i++){
                 if (Fruits[i].isAlive == true){
@@ -238,6 +264,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     public void mousePressed(MouseEvent e) {
         if (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
             started = true;
+            startTime = (int)(System.currentTimeMillis());
         }
     }
 
