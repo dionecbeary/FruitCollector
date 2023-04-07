@@ -47,7 +47,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         Fruits = new Fruit[5];
         for (int i = 0; i<Fruits.length; i++){
             Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
-            fruitCount += 1;
+            fruitCount +=1;
         }
     }
 
@@ -74,29 +74,24 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     }
     public void intersections(){
         for (int i = 0; i<Fruits.length; i++){
-            if ((Fruits[i].rec.intersects(P1.rec)&&(P1.isCrashing == false) )||( Fruits[i].rec.intersects(P2.rec)&&(P2.isCrashing == false))){
+            if (Fruits[i].isAlive == true){
                 if (Fruits[i].rec.intersects(P1.rec)){
-//               System.out.println("point to P1");
                     score1 +=1;
-                    P1.isCrashing = true;
+                    Fruits[i].isAlive = false;
+                    fruitCount -=1;
                 }
                 if (Fruits[i].rec.intersects(P2.rec)){
-//                System.out.println("point to P2");
                     score2 += 1;
-                    P2.isCrashing = true;
+                    Fruits[i].isAlive = false;
+                    fruitCount -=1;
                 }
-                Fruits[i].isAlive = false;
-                fruitCount -= 1;
-                System.out.println(fruitCount);
-                if (fruitCount == 2 ){
-                    int n = (int)(Math.random()*5);
-                    Fruits[n] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, n);
-                    fruitCount +=1;
+                if (fruitCount < 3 ){
+
+                    Fruits[Fruits.length+1] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i%5);
+                    fruitCount += 1;
                 }
-            }
-            if (Fruits[i].rec.intersects(P1.rec) == false && Fruits[i].rec.intersects(P2.rec) == false){
-                P1.isCrashing = false;
-                P2.isCrashing = false;
+                    System.out.println(fruitCount);
+
             }
         }
     }
@@ -159,7 +154,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         } else if (started == true){
             for (int i = 0; i < Fruits.length; i++){
                 if (Fruits[i].isAlive == true){
-                    g.drawImage(FruitPics[Fruits[(i+1)%5].image], Fruits[i].xpos, Fruits[i].ypos, 40,40,null);
+                    g.drawImage(FruitPics[Fruits[i].image], Fruits[i].xpos, Fruits[i].ypos, 40,40,null);
 //            g.draw(new Rectangle(Fruits[i].xpos, Fruits[i].ypos, 40,40));
                 }
             }
