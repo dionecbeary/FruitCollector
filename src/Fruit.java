@@ -1,3 +1,4 @@
+import java.awt.*;
 public class Fruit {
     public int xpos, ypos, width, height, dx, dy, image;
     public boolean isAlive;

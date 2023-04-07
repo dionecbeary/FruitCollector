@@ -1,6 +1,7 @@
+import java.awt.*;
 public class Player {
     public int xpos, ypos, width, height, dx, dy;
-    public boolean isAlive;
+    public boolean isAlive, isCrashing;
     public Rectangle rec;
     public Player(int pXpos, int pYpos, int pDx, int pDy){
         xpos = pXpos;
@@ -10,6 +11,7 @@ public class Player {
         height = 30;
         dx = pDx;
         dy = pDy;
+        isCrashing = false;
         rec = new Rectangle(xpos, ypos, (int)width, height);
     }
     public void move(){

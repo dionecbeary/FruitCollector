@@ -9,7 +9,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     final int WIDTH = 1000;
     final int HEIGHT = 700;
     public JFrame frame;
-    public int d1, d2, score1, score2;
+    public int d1, d2, score1, score2, fruitCount;
     public boolean started;
     public Canvas canvas;
     public JPanel panel;
@@ -17,7 +17,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     public Player P1, P2;
     public Image greenLPic, greenRPic, purpleLPic, purpleRPic;
     public Image Pic1, Pic2;
-    public Image fieldPic, startPic;
+    public Image arenaPic, startPic;
     public Image[] FruitPics = {Toolkit.getDefaultToolkit().getImage("Fruit1.png"), Toolkit.getDefaultToolkit().getImage("Fruit2.png"), Toolkit.getDefaultToolkit().getImage("Fruit3.png"), Toolkit.getDefaultToolkit().getImage("Fruit4.png"), Toolkit.getDefaultToolkit().getImage("Fruit5.png")};
     public Fruit[] Fruits;
 
@@ -30,20 +30,24 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         setUpGraphics();
         greenLPic = Toolkit.getDefaultToolkit().getImage("greenL.png");
         greenRPic = Toolkit.getDefaultToolkit().getImage("greenR.png");
+        purpleLPic = Toolkit.getDefaultToolkit().getImage("purpleL.png");
+        purpleRPic = Toolkit.getDefaultToolkit().getImage("purpleR.png");
         startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
         Pic1 = greenRPic;
-        Pic2 = greenLPic;
-        fieldPic = Toolkit.getDefaultToolkit().getImage("Field.png");
+        Pic2 = purpleLPic;
+        arenaPic = Toolkit.getDefaultToolkit().getImage("arena.jpeg");
         P1 = new Player(25, 325, 0, 0);
         P2 = new Player(915, 325, 0, 0);
         d1 = 2;
         d2 = 2;
         score1 = 0;
         score2 = 0;
+        fruitCount = 0;
         started = false;
         Fruits = new Fruit[5];
-        for (int i = 0; i<5; i++){
+        for (int i = 0; i<Fruits.length; i++){
             Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
+            fruitCount += 1;
         }
     }
 
@@ -52,6 +56,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         while (true) {
             if (started == true){
                 moveThings();//move all the game objects
+
             }
             render();  // paint the graphics
 //            pause(10); // sleep for 10 ms
@@ -65,13 +70,34 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         P1.move();
         P2.crash(100, 940);
         P2.move();
+        intersections();
     }
     public void intersections(){
-        for (int i = 0; i<5; i++){
-           if (Fruits[i].rec.intersects(P1.rec)){
-               System.out.println("intersection");
-           }
-            Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
+        for (int i = 0; i<Fruits.length; i++){
+            if ((Fruits[i].rec.intersects(P1.rec)&&(P1.isCrashing == false) )||( Fruits[i].rec.intersects(P2.rec)&&(P2.isCrashing == false))){
+                if (Fruits[i].rec.intersects(P1.rec)){
+//               System.out.println("point to P1");
+                    score1 +=1;
+                    P1.isCrashing = true;
+                }
+                if (Fruits[i].rec.intersects(P2.rec)){
+//                System.out.println("point to P2");
+                    score2 += 1;
+                    P2.isCrashing = true;
+                }
+                Fruits[i].isAlive = false;
+                fruitCount -= 1;
+                System.out.println(fruitCount);
+                if (fruitCount == 2 ){
+                    int n = (int)(Math.random()*5);
+                    Fruits[n] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, n);
+                    fruitCount +=1;
+                }
+            }
+            if (Fruits[i].rec.intersects(P1.rec) == false && Fruits[i].rec.intersects(P2.rec) == false){
+                P1.isCrashing = false;
+                P2.isCrashing = false;
+            }
         }
     }
 
@@ -123,15 +149,20 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
         //code here
-        g.drawImage(fieldPic, 100, 0, 800, 700, null);
+        g.drawImage(arenaPic, 100, 0, 800, 700, null);
+        g.drawImage(Toolkit.getDefaultToolkit().getImage("green.png"), 0, 0, 100, 700, null);
+        g.drawImage(Toolkit.getDefaultToolkit().getImage("purple.png"), 900, 0, 100, 700, null);
         g.drawImage(Pic1, P1.xpos, P1.ypos, 60, 50, null);
         g.drawImage(Pic2, P2.xpos, P2.ypos, 60, 50, null);
-        for (int i = 0; i < 5; i++){
-            g.drawImage(FruitPics[Fruits[i].image], Fruits[i].xpos, Fruits[i].ypos, 40,40,null);
-            g.draw(new Rectangle(Fruits[i].xpos, Fruits[i].ypos, 40,40));
-        }
         if (started == false){
             g.drawImage(startPic, 400, 300, 200, 100, null);
+        } else if (started == true){
+            for (int i = 0; i < Fruits.length; i++){
+                if (Fruits[i].isAlive == true){
+                    g.drawImage(FruitPics[Fruits[(i+1)%5].image], Fruits[i].xpos, Fruits[i].ypos, 40,40,null);
+//            g.draw(new Rectangle(Fruits[i].xpos, Fruits[i].ypos, 40,40));
+                }
+            }
         }
 
         g.dispose();
@@ -188,9 +219,9 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
             Pic1 = greenLPic;
         }
         if(P2.dx>0){
-            Pic2 = greenRPic;
+            Pic2 = purpleRPic;
         }else if(P2.dx<0){
-            Pic2 = greenLPic;
+            Pic2 = purpleLPic;
         }
     }
 
@@ -239,7 +270,6 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     public void mouseMoved(MouseEvent e) {
 //        System.out.println(e.getX() + e.getY());
         if (started == false && e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
-            System.out.println("hovering");
             startPic = Toolkit.getDefaultToolkit().getImage("Start copy.png");
         }else{
             startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
