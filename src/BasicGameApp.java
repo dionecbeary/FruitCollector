@@ -10,9 +10,9 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     final int WIDTH = 1000;
     final int HEIGHT = 700;
     public JFrame frame;
-    public int d1, d2, score1, score2, fruitCount;
-    public int startTime;
-    public boolean started, ended;
+    public int d1, d2, score1, score2, fruitCount, starty;
+    public int startTime, time;
+    public boolean started, ended, empty;
     public Canvas canvas;
     public JPanel panel;
     public BufferStrategy bufferStrategy;
@@ -22,7 +22,6 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     public Image arenaPic, startPic, scorePic;
     public Image[] FruitPics = {Toolkit.getDefaultToolkit().getImage("Fruit1.png"), Toolkit.getDefaultToolkit().getImage("Fruit2.png"), Toolkit.getDefaultToolkit().getImage("Fruit3.png"), Toolkit.getDefaultToolkit().getImage("Fruit4.png"), Toolkit.getDefaultToolkit().getImage("Fruit5.png")};
     public Fruit[] Fruits;
-    public Fruit[] deadFruits;
 
     public static void main(String[] args) {
         BasicGameApp ex = new BasicGameApp();   //creates a new instance of the game
@@ -36,7 +35,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         purpleLPic = Toolkit.getDefaultToolkit().getImage("purpleL.png");
         purpleRPic = Toolkit.getDefaultToolkit().getImage("purpleR.png");
         startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
-        scorePic = Toolkit.getDefaultToolkit().getImage("score.png");
+        scorePic = Toolkit.getDefaultToolkit().getImage("Score.png");
 
         Pic1 = greenRPic;
         Pic2 = purpleLPic;
@@ -48,8 +47,11 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         score1 = 0;
         score2 = 0;
         fruitCount = 0;
+        starty = 280;
+        time = 0;
         started = false;
         ended = false;
+        empty = false;
         Fruits = new Fruit[5];
         for (int i = 0; i<Fruits.length; i++){
             Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, i);
@@ -81,19 +83,15 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     }
     public void timer(){
         int currentTime = (int)(System.currentTimeMillis());
-        if (currentTime - startTime == 30000){
+        if (currentTime - startTime > 20000){
+            System.out.println("Stop");
             started = false;
             ended = true;
-            System.out.println("Player 1: " + score1 + "    Player 2: " + score2);
-            if (score1 > score2){
-                System.out.println("Player 1 wins!");
-            }else if (score2 > score1){
-                System.out.println("Player 2 wins!");
-            }else if (score1 == score2){
-                System.out.println("You are tied!");
-            }
         }
-
+        if (currentTime-time == 1000){
+            time += 1000;
+            System.out.println(time/1000);
+        }
     }
     public void intersections(){
         for (int i = 0; i<Fruits.length; i++){
@@ -173,9 +171,9 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         g.drawImage(Pic2, P2.xpos, P2.ypos, 60, 50, null);
         if (started == false){
             if (ended == false){
-                g.drawImage(startPic, 400, 300, 200, 100, null);
-            }else if (ended == true){
-                g.drawImage(scorePic,420, 330, 160, 40, null);
+                g.drawImage(startPic, 350, starty, 300, 100, null);
+            }else if (ended == true && empty == false){
+                g.drawImage(scorePic,300, starty, 400, 100, null);
             }
         } else if (started == true){
             for (int i = 0; i < Fruits.length; i++){
@@ -262,9 +260,21 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
+        if (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400 && ended == false && started == false){
             started = true;
             startTime = (int)(System.currentTimeMillis());
+            System.out.println("20 second timer started!");
+        }
+        if (e.getX() > 300 && e.getX() <700 && e.getY() >300 && e.getY() <400 && ended == true && started == false){
+            System.out.println("Player 1: " + score1 + "    Player 2: " + score2);
+            if (score1 > score2){
+                System.out.println("Player 1 wins!");
+            }else if (score2 > score1){
+                System.out.println("Player 2 wins!");
+            }else if (score1 == score2){
+                System.out.println("You are tied!");
+            }
+            empty = true;
         }
     }
 
@@ -291,10 +301,10 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
     @Override
     public void mouseMoved(MouseEvent e) {
 //        System.out.println(e.getX() + e.getY());
-        if (started == false && e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400){
-            startPic = Toolkit.getDefaultToolkit().getImage("Start copy.png");
+        if (started == false && ((ended == false && (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400)) || (ended == true && (e.getX() > 300 && e.getX() <700 && e.getY() >300 && e.getY() <400)))){
+            starty = 285;
         }else{
-            startPic = Toolkit.getDefaultToolkit().getImage("Start.png");
+            starty = 280;
         }
     }
 }
