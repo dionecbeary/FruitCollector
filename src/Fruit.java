@@ -23,6 +23,20 @@ public class Fruit {
             dx=-dx;
         }
     }
+    public void wrap(){
+        if (xpos<100){// ypos > 700-hieght
+            xpos = 900-30;
+        }
+        if (xpos > 900-30){
+            xpos = 100;
+        }
+        if (ypos < 0){
+            ypos = 700-30;
+        }
+        if (ypos > 700-30){
+            ypos = 0;
+        }
+    }
     public void move(){
         xpos = xpos + dx;
         ypos = ypos + dy;

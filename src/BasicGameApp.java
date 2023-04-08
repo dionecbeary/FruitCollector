@@ -78,13 +78,17 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         P1.move();
         P2.crash(100, 940);
         P2.move();
+        for (int i = 0; i < Fruits.length; i++){
+            Fruits[i].wrap();
+            Fruits[i].move();
+        }
         timer();
         intersections();
     }
     public void timer(){
         int currentTime = (int)(System.currentTimeMillis());
-        if (currentTime - startTime > 20000){
-            System.out.println("Stop");
+        if (currentTime - startTime > 30000){
+            System.out.println("Time's up");
             started = false;
             ended = true;
         }
@@ -107,8 +111,35 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
                     fruitCount -=1;
                 }
                 if (fruitCount < 2 ){
+//                    int dx = 0;
+//                    int dy = 0;
+//                    int n = (int)(Math.random()*5);
+//                    int chance = (int)(Math.random()*6);
+//                    if (chance == 0){
+//                        chance = (int)(Math.random()*2);
+//                        if (chance == 0){
+//                            dx = (int)(Math.random()*4);
+//                            dy = (int)(Math.random()*4);
+//                        }else{
+//                            dx = -(int)(Math.random()*4);
+//                            dy = -(int)(Math.random()*4);
+//                        }
+//                    }
+                    int dx = 0;
+                    int dy = 0;
                     int n = (int)(Math.random()*5);
-                    Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), 0, 0, n);
+                    int chance = (int)(Math.random()*2);
+                    if (chance == 0){
+                        chance = (int)(Math.random()*2);
+                        if (chance == 0){
+                            dx = (int)(Math.random()*3);
+                            dy = (int)(Math.random()*3);
+                        }else{
+                            dx = -(int)(Math.random()*3);
+                            dy = -(int)(Math.random()*3);
+                        }
+                    }
+                    Fruits[i] = new Fruit((int)(Math.random()*760)+100, (int)(Math.random()*660), dx, dy, n);
                     Fruits[i].isAlive = true;
                     fruitCount +=1;
                 }
@@ -263,7 +294,7 @@ public class BasicGameApp implements Runnable, KeyListener, MouseListener, Mouse
         if (e.getX() > 400 && e.getX() <600 && e.getY() >300 && e.getY() <400 && ended == false && started == false){
             started = true;
             startTime = (int)(System.currentTimeMillis());
-            System.out.println("20 second timer started!");
+            System.out.println("30 second timer started");
         }
         if (e.getX() > 300 && e.getX() <700 && e.getY() >300 && e.getY() <400 && ended == true && started == false){
             System.out.println("Player 1: " + score1 + "    Player 2: " + score2);

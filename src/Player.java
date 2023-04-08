@@ -26,12 +26,18 @@ public class Player {
             dx=-dx;
         }
     }
-    public void wrap(){ // when eaten special fruit
+    public void wrap(){
         if (xpos<100){// ypos > 700-hieght
-            xpos = 900;
+            xpos = 900-30;
         }
-        if (xpos>900){
+        if (xpos > 900-30){
             xpos = 100;
+        }
+        if (ypos < 0){
+            ypos = 700-30;
+        }
+        if (ypos > 700-30){
+            ypos = 0;
         }
     }
 }
